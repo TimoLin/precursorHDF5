@@ -1,4 +1,3 @@
-AverageIOFields.C
 timeVaryingMappedHDF5FixedValueFvPatchFields.C
 
 LIB = $(FOAM_USER_LIBBIN)/libtimeVaryingMappedHDF5FixedValue
