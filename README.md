@@ -37,31 +37,14 @@ For example, one could have the following in the 0/U file.
 #!c++
 
 inlet
-
 {
-
     type            timeVaryingMappedHDF5FixedValue;
-
     setAverage      false;
-
     offset          (0 0 0);
-
     perturb         0.0;
-
     hdf5FileName    "dbTest.hdf5";
-
     hdf5PointsDatasetName    "points";
-
     hdf5SampleTimesDatasetName    "time";
-
     hdf5FieldValuesDatasetName    "velocity";
-
 }
-```
-
-
-```
-#!c++
-
-
 ```
