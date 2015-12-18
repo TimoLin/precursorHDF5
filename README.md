@@ -19,16 +19,26 @@ The HDF5_DIR environmental variable, pointing to the installation directory of h
 Nothing else should be required, just run wmake.
 
 ### Usage ###
-The boundary condition expects that the hdf5 file will contain three datasets: one for the points, one for the time-values that the data is provided for and one for the data itself.
-One should therefore provide the following parameters in the definition of the boundary type.
+The boundary condition expects that the hdf5 file will contain three datasets.
 
-hdf5FileName -- name the hdf5 file
+One for the points, of shape N by 3, where N is the number of points you have available.
+The first column contains the x coordinates, the second the y coordinates, and the third the z coordinates.
 
-hdf5PointsDatasetName -- name of the dataset containg the points
+One for the time-values that the data is provided for, of shape nTimeValues by 1, where nTimeValues is simply the number of time-values that you are providing the data for.
 
-hdf5SampleTimesDatasetName -- name of the dataset containing the sample times
+One for the data itself, of shape N by nComponents by nTimeValues, where nComponents depends on what type of field one is dealing with.
+For a vector field nComponents is 3, for instance.
+The ordering of the data should be in agreement with the ordering of the points, i.e. the first value is expected to correspond to the first point etc.
 
-hdf5FieldValuesDatasetName -- name of the dataset containing the values of the field 
+One should provide the following parameters in the definition of the boundary type.
+
+hdf5FileName -- name the hdf5 file.
+
+hdf5PointsDatasetName -- name of the dataset containg the points.
+
+hdf5SampleTimesDatasetName -- name of the dataset containing the sample times.
+
+hdf5FieldValuesDatasetName -- name of the dataset containing the values of the field .
 
 For example, one could have the following in the 0/U file.
 
@@ -48,3 +58,6 @@ inlet
     hdf5FieldValuesDatasetName    "velocity";
 }
 ```
+
+### Current limitations ###
+Currently the boundary condition only works with vector fields!
