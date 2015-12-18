@@ -15,10 +15,13 @@ The main advantage is that API for reading and writing HDF5 files exist for many
 
 ### Installation ###
 
-The main prerequisite is that you have some implementation of the hdf5 library present on your system.
+The main prerequisite is that you have some implementation of the hdf5 library present on your system. 
+The compilation goes well at least with version 1.8.13 and 1.8.14 of the library.
 The HDF5_DIR environmental variable, pointing to the installation directory of hdf5 should be available at compile time.
 
 Nothing else should be required, just run wmake.
+
+The boundary condition has so far been only used in OpenFOAM version 2.3.1.
 
 ### Usage ###
 The boundary condition expects that the hdf5 file will contain three datasets.
