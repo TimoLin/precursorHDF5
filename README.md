@@ -32,6 +32,10 @@ hdf5FieldValuesDatasetName -- name of the dataset containing the values of the f
 
 For example, one could have the following in the 0/U file.
 
+
+```
+#!c++
+
 inlet
 
 {
@@ -53,3 +57,11 @@ inlet
     hdf5FieldValuesDatasetName    "velocity";
 
 }
+```
+
+
+```
+#!c++
+
+
+```
