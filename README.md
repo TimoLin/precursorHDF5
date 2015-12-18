@@ -10,6 +10,8 @@ That is, for each time-value a separate directory is created.
 When there is a need to provide data for thousands of different time-values this approach becomes very hard to deal with.
 
 This modification makes the boundary condition read all the data from a single file, in HDF5 format.
+More about this file format can be found [at the official web-site](https://www.hdfgroup.org/HDF5/).
+The main advantage is that API for reading and writing HDF5 files exist for many languages (python, Matlab, C, Fortran...).
 
 ### Installation ###
 
