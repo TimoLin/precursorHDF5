@@ -445,7 +445,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
     }
 
     // Create an array to read in the points
-    double velocity[nVelocity[0]][nVelocity[1]];
+    double velocity[nVelocity[1]][nVelocity[2]];
 
     // Open the velocity dataset
     hid_t velocityDataset = H5Dopen(hdf5DataBase,
@@ -459,13 +459,13 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
     offset[2] = 0;
 
     hsize_t count[3];
-    count[0] = nVelocity[0];
-    count[1] = nVelocity[1];
+    count[0] = nVelocity[1];
+    count[1] = nVelocity[2];
     count[2] = 1;
 
     hsize_t nVelocitySlice[2];
-    nVelocitySlice[0] = nVelocity[0];
-    nVelocitySlice[1] = nVelocity[1];
+    nVelocitySlice[0] = nVelocity[1];
+    nVelocitySlice[1] = nVelocity[2];
 
     hid_t velocityMemspace = H5Screate_simple(2, nVelocitySlice, NULL);  
 
@@ -501,7 +501,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
             }
             
             
-            offset[2] = lo;
+            offset[0] = lo;
 
             hdf5Status = H5Sselect_hyperslab(velocityDataspace, H5S_SELECT_SET, offset, NULL,
                                              count, NULL);
@@ -545,7 +545,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
                     IOobject::NO_WRITE,
                     false
                 ),
-                nVelocity[0]
+                nVelocity[1]
             );
 
             if (vals.size() != mapperPtr_().sourceSize())
@@ -603,7 +603,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
                     << endl;
             }
 
-            offset[2] = hi;
+            offset[0] = hi;
 
             hdf5Status = H5Sselect_hyperslab(velocityDataspace, H5S_SELECT_SET, offset, NULL, 
                                               count, NULL);
@@ -638,7 +638,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
                     IOobject::NO_WRITE,
                     false
                 ),
-                nVelocity[0]
+                nVelocity[1]
             );
 
             if (vals.size() != mapperPtr_().sourceSize())
