@@ -51,7 +51,7 @@ Description
         perturb      | perturb points for regular geometries | no | 1e-5
         fieldTableName | alternative field name to sample | no| this field name
         mapMethod    | type of mapping | no | planarInterpolation
-        hdf5FileName | name the hdf5 file  ;$
+        hdf5FileName | name the hdf5 file  | yes
         hdf5PointsDatasetName      | name of the dataset containg the points | yes
         hdf5SampleTimesDatasetName | name of the dataset containing the sample times | yes
         hdf5FieldValuesDatasetName | name of the dataset containing the
