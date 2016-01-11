@@ -31,7 +31,7 @@ The first column contains the x coordinates, the second the y coordinates, and t
 
 One for the time-values that the data is provided for, of shape nTimeValues by 1, where nTimeValues is simply the number of time-values that you are providing the data for.
 
-One for the data itself, of shape N by nComponents by nTimeValues, where nComponents depends on what type of field one is dealing with.
+One for the data itself, of shape nTimeValues by N by nComponents, where nComponents depends on what type of field one is dealing with.
 For a vector field nComponents is 3, for instance.
 The ordering of the data should be in agreement with the ordering of the points, i.e. the first value is expected to correspond to the first point etc.
 
