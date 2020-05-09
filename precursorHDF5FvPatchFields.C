@@ -23,28 +23,21 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef timeVaryingMappedHDF5FixedValueFvPatchFieldsFwd_H
-#define timeVaryingMappedHDF5FixedValueFvPatchFieldsFwd_H
-
-#include "fieldTypes.H"
+#include "precursorHDF5FvPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
+#include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-template<class Type> class timeVaryingMappedHDF5FixedValueFvPatchField;
-
-makePatchTypeFieldTypedefs(timeVaryingMappedHDF5FixedValue);
+makePatchFields(precursorHDF5);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "timeVaryingMappedHDF5FixedValueFvPatchField.H"
+#include "precursorHDF5FvPatchField.H"
 #include "Time.H"
 #include "AverageIOField.H"
 
@@ -37,8 +37,8 @@ namespace Foam
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-timeVaryingMappedHDF5FixedValueFvPatchField<Type>::
-timeVaryingMappedHDF5FixedValueFvPatchField
+precursorHDF5FvPatchField<Type>::
+precursorHDF5FvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF
@@ -62,10 +62,10 @@ timeVaryingMappedHDF5FixedValueFvPatchField
 
 
 template<class Type>
-timeVaryingMappedHDF5FixedValueFvPatchField<Type>::
-timeVaryingMappedHDF5FixedValueFvPatchField
+precursorHDF5FvPatchField<Type>::
+precursorHDF5FvPatchField
 (
-    const timeVaryingMappedHDF5FixedValueFvPatchField<Type>& ptf,
+    const precursorHDF5FvPatchField<Type>& ptf,
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
     const fvPatchFieldMapper& mapper
@@ -95,8 +95,8 @@ timeVaryingMappedHDF5FixedValueFvPatchField
 
 
 template<class Type>
-timeVaryingMappedHDF5FixedValueFvPatchField<Type>::
-timeVaryingMappedHDF5FixedValueFvPatchField
+precursorHDF5FvPatchField<Type>::
+precursorHDF5FvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
@@ -133,8 +133,8 @@ timeVaryingMappedHDF5FixedValueFvPatchField
     {
         FatalIOErrorIn
         (
-            "timeVaryingMappedHDF5FixedValueFvPatchField<Type>::\n"
-            "timeVaryingMappedHDF5FixedValueFvPatchField\n"
+            "precursorHDF5FvPatchField<Type>::\n"
+            "precursorHDF5FvPatchField\n"
             "(\n"
             "    const fvPatch&\n"
             "    const DimensionedField<Type, volMesh>&\n"
@@ -168,10 +168,10 @@ timeVaryingMappedHDF5FixedValueFvPatchField
 
 
 template<class Type>
-timeVaryingMappedHDF5FixedValueFvPatchField<Type>::
-timeVaryingMappedHDF5FixedValueFvPatchField
+precursorHDF5FvPatchField<Type>::
+precursorHDF5FvPatchField
 (
-    const timeVaryingMappedHDF5FixedValueFvPatchField<Type>& ptf
+    const precursorHDF5FvPatchField<Type>& ptf
 )
 :
     fixedValueFvPatchField<Type>(ptf),
@@ -201,10 +201,10 @@ timeVaryingMappedHDF5FixedValueFvPatchField
 
 
 template<class Type>
-timeVaryingMappedHDF5FixedValueFvPatchField<Type>::
-timeVaryingMappedHDF5FixedValueFvPatchField
+precursorHDF5FvPatchField<Type>::
+precursorHDF5FvPatchField
 (
-    const timeVaryingMappedHDF5FixedValueFvPatchField<Type>& ptf,
+    const precursorHDF5FvPatchField<Type>& ptf,
     const DimensionedField<Type, volMesh>& iF
 )
 :
@@ -237,7 +237,7 @@ timeVaryingMappedHDF5FixedValueFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::autoMap
+void precursorHDF5FvPatchField<Type>::autoMap
 (
     const fvPatchFieldMapper& m
 )
@@ -256,7 +256,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::autoMap
 
 
 template<class Type>
-void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::rmap
+void precursorHDF5FvPatchField<Type>::rmap
 (
     const fvPatchField<Type>& ptf,
     const labelList& addr
@@ -264,8 +264,8 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::rmap
 {
     fixedValueFvPatchField<Type>::rmap(ptf, addr);
 
-    const timeVaryingMappedHDF5FixedValueFvPatchField<Type>& tiptf =
-        refCast<const timeVaryingMappedHDF5FixedValueFvPatchField<Type> >(ptf);
+    const precursorHDF5FvPatchField<Type>& tiptf =
+        refCast<const precursorHDF5FvPatchField<Type> >(ptf);
 
     startSampledValues_.rmap(tiptf.startSampledValues_, addr);
     endSampledValues_.rmap(tiptf.endSampledValues_, addr);
@@ -278,7 +278,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::rmap
 
 
 template<class Type>
-void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
+void precursorHDF5FvPatchField<Type>::checkTable()
 {
     hid_t hdf5DataBase = H5Fopen(hdf5FileName_.c_str(),
                                  H5F_ACC_RDONLY,
@@ -333,7 +333,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
             samplePoints[pointI][2] = points[pointI][2];
         }
 
-        Info << "timeVaryingMappedHDF5FixedValueFvPatchField :"
+        Info << "precursorHDF5FvPatchField :"
              << " Read " << samplePoints.size() << " points" << endl;
 
         if (false)
@@ -415,7 +415,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
     {
         FatalErrorIn
         (
-            "timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()"
+            "precursorHDF5FvPatchField<Type>::checkTable()"
         )   << "Cannot find starting sampling values for current time "
             << this->db().time().value() << nl
             << "Have sampling values for times "
@@ -552,7 +552,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
             {
                 FatalErrorIn
                 (
-                    "timeVaryingMappedHDF5FixedValueFvPatchField<Type>::"
+                    "precursorHDF5FvPatchField<Type>::"
                     "checkTable()"
                 )   << "Number of values (" << vals.size()
                     << ") differs from the number of points ("
@@ -645,7 +645,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
             {
                 FatalErrorIn
                 (
-                    "timeVaryingMappedHDF5FixedValueFvPatchField<Type>::"
+                    "precursorHDF5FvPatchField<Type>::"
                     "checkTable()"
                 )   << "Number of values (" << vals.size()
                     << ") differs from the number of points ("
@@ -682,7 +682,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::checkTable()
 
 
 template<class Type>
-void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::updateCoeffs()
+void precursorHDF5FvPatchField<Type>::updateCoeffs()
 {
     if (this->updated())
     {
@@ -787,7 +787,7 @@ void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::updateCoeffs()
 
 
 template<class Type>
-void timeVaryingMappedHDF5FixedValueFvPatchField<Type>::write(Ostream& os) const
+void precursorHDF5FvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
     os.writeKeyword("setAverage") << setAverage_ << token::END_STATEMENT << nl;

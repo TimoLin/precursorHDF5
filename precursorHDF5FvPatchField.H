@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::timeVaryingMappedHDF5FixedValueFvPatchField
+    Foam::precursorHDF5FvPatchField
 
 Group
     grpInletBoundaryConditions grpCoupledBoundaryConditions
@@ -61,7 +61,7 @@ Description
     /verbatim
     myPatch
     {
-        type            timeVaryingMappedHDF5FixedValue;
+        type            precursorHDF5;
         setAverage      false;
         //perturb       0.0;
         //fieldTableName samples;
@@ -77,12 +77,12 @@ SeeAlso
     Foam::fixedValueFvPatchField
 
 SourceFiles
-    timeVaryingMappedHDF5FixedValueFvPatchField.C
+    precursorHDF5FvPatchField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef timeVaryingMappedHDF5FixedValueFvPatchField_H
-#define timeVaryingMappedHDF5FixedValueFvPatchField_H
+#ifndef precursorHDF5FvPatchField_H
+#define precursorHDF5FvPatchField_H
 
 #include "fixedValueFvPatchFields.H"
 #include "FixedList.H"
@@ -96,11 +96,11 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-          Class timeVaryingMappedHDF5FixedValueFvPatchField Declaration
+          Class precursorHDF5FvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class timeVaryingMappedHDF5FixedValueFvPatchField
+class precursorHDF5FvPatchField
 :
     public fixedValueFvPatchField<Type>
 {
@@ -160,40 +160,40 @@ class timeVaryingMappedHDF5FixedValueFvPatchField
 public:
 
     //- Runtime type information
-    TypeName("timeVaryingMappedHDF5FixedValue");
+    TypeName("precursorHDF5");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        timeVaryingMappedHDF5FixedValueFvPatchField
+        precursorHDF5FvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        timeVaryingMappedHDF5FixedValueFvPatchField
+        precursorHDF5FvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given timeVaryingMappedHDF5FixedValueFvPatchField
+        //- Construct by mapping given precursorHDF5FvPatchField
         //  onto a new patch
-        timeVaryingMappedHDF5FixedValueFvPatchField
+        precursorHDF5FvPatchField
         (
-            const timeVaryingMappedHDF5FixedValueFvPatchField<Type>&,
+            const precursorHDF5FvPatchField<Type>&,
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        timeVaryingMappedHDF5FixedValueFvPatchField
+        precursorHDF5FvPatchField
         (
-            const timeVaryingMappedHDF5FixedValueFvPatchField<Type>&
+            const precursorHDF5FvPatchField<Type>&
         );
 
         //- Construct and return a clone
@@ -201,14 +201,14 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new timeVaryingMappedHDF5FixedValueFvPatchField<Type>(*this)
+                new precursorHDF5FvPatchField<Type>(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        timeVaryingMappedHDF5FixedValueFvPatchField
+        precursorHDF5FvPatchField
         (
-            const timeVaryingMappedHDF5FixedValueFvPatchField<Type>&,
+            const precursorHDF5FvPatchField<Type>&,
             const DimensionedField<Type, volMesh>&
         );
 
@@ -220,7 +220,7 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new timeVaryingMappedHDF5FixedValueFvPatchField<Type>(*this, iF)
+                new precursorHDF5FvPatchField<Type>(*this, iF)
             );
         }
 
@@ -276,7 +276,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "timeVaryingMappedHDF5FixedValueFvPatchField.C"
+#   include "precursorHDF5FvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
