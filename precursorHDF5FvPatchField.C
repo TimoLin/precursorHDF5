@@ -819,6 +819,17 @@ void precursorHDF5FvPatchField<Type>::write(Ostream& os) const
 
     offset_->writeData(os);
 
+    os.writeKeyword("hdf5FileName") << hdf5FileName_ << token::END_STATEMENT <<nl;
+
+    os.writeKeyword("hdf5PointsDatasetName") << hdf5PointsDatasetName_
+        << token::END_STATEMENT <<nl;
+
+    os.writeKeyword("hdf5SampleTimesDatasetName") << hdf5SampleTimesDatasetName_
+        << token::END_STATEMENT <<nl;
+
+    os.writeKeyword("hdf5FieldValuesDatasetName") << hdf5FieldValuesDatasetName_
+        << token::END_STATEMENT <<nl;
+
     this->writeEntry("value", os);
 }
 
@@ -827,4 +838,4 @@ void precursorHDF5FvPatchField<Type>::write(Ostream& os) const
 
 } // End namespace Foam
 
-// ************************************************************************* //
+//// ************************************************************************* //
