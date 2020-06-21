@@ -563,7 +563,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
             }
             
             if (this->db().template 
-                    foundObject<Field<vector> >("dummy") )
+                    foundObject<AverageIOField<vector > >("dummy") )
             {
                 Info << "Assigning read velocity values" << endl;
                 AverageIOField<vector> & field(const_cast<AverageIOField<vector> &>(this->db().template
