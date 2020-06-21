@@ -1,29 +1,46 @@
-# timeVaryingMappedHDF5FixedValue #
+# precursorHDF5
 
-This code is a modification of the timeVaryingMappedFixedValue boundary condition found in OpenFOAM.
-This boundary condition allows to prescribe the value of the field by explicitly providing the values at a number of points.
-The boundary condition will then use interpolation in order to obtain the values at the face centers.
-Moreover, the boundary condition allows to interpolate between the prescribed values in time.
-
-In the original implementation the data is put into constant/boundaryData/patchName/timeValue.
-That is, for each time-value a separate directory is created.
-When there is a need to provide data for thousands of different time-values this approach becomes very hard to deal with.
+This boundary condition is adapted from [timevaryingmappedhdf5fixedvalue](https://gitlab.com/chalmers-marine-technology/timevaryingmappedhdf5fixedvalue).
 
 This modification makes the boundary condition read all the data from a single file, in HDF5 format.
 More about this file format can be found [at the official web-site](https://www.hdfgroup.org/HDF5/).
-The main advantage is that API for reading and writing HDF5 files exist for many languages (python, Matlab, C, Fortran...).
 
-### Installation ###
+## Prerequisite
+### HDF5 library
 
-The main prerequisite is that you have some implementation of the hdf5 library present on your system. 
-The compilation goes well at least with version 1.8.13 and 1.8.14 of the library.
-The HDF5_DIR environmental variable, pointing to the installation directory of hdf5 should be available at compile time.
+Intallation note:  
+```sh
+# Install path
+cd $HOME/software
+mkdir hdf5
+cd hdf5
+# Get hdf5-1.8.3 binary release
+wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.3/bin/linux-x86_64/5-1.8.3-linux-x86_64-shared.tar.gz
+# Unpack 
+tar xzf 5-1.8.3-linux-x86_64-shared.tar.gz
+rm 5-1.8.3-linux-x86_64-shared.tar.gz
+# Make a symbolic link "latest"
+ln -s 5-1.8.3-linux-x86_64-shared latest
+# Redeploy script
+cd latest/bin
+./h5redeploy
+```
+Set `hdf5` path in `.zshrc` or `.bashrc`:
+```sh
+export HDF5_DIR=$HOME/software/hdf5/latest
+```
+### Install
+Clone this repo to your local drive and compile, say: 
+```sh
+git clone git@github.com:TimoLin/precursorHDF5.git ~/OpenFOAM/$WM_PROJECT_USER_DIR/precursorHDF5
+cd ~/OpenFOAM/$WM_PROJECT_USER_DIR/precursorHDF5
+wmake
+```
 
-Nothing else should be required, just run wmake.
-
-The boundary condition has so far been only used in OpenFOAM version 2.3.1.
-
-### Usage ###
+## Usage
+### Generate the hdf5 file
+Follow this Python script [tVMHDF5FV](https://github.com/TimoLin/pyScriptFoam/tree/master/inletTurb/tVMHDF5FV).  
+### Use this bc
 The boundary condition expects that the hdf5 file will contain three datasets.
 
 One for the points, of shape N by 3, where N is the number of points you have available.
@@ -46,23 +63,24 @@ hdf5SampleTimesDatasetName -- name of the dataset containing the sample times.
 hdf5FieldValuesDatasetName -- name of the dataset containing the values of the field .
 
 For example, one could have the following in the 0/U file.
-
-
-```
-#!c++
-
+```cpp
 inlet
 {
-    type            timeVaryingMappedHDF5FixedValue;
+    type            precursorHDF5;
     setAverage      false;
     offset          (0 0 0);
     perturb         0.0;
     hdf5FileName    "dbTest.hdf5";
     hdf5PointsDatasetName    "points";
-    hdf5SampleTimesDatasetName    "time";
+    hdf5SampleTimesDatasetName    "times";
     hdf5FieldValuesDatasetName    "velocity";
 }
 ```
 
-### Current limitations ###
+Add the following line to `controlDict` when using it:
+```cpp
+libs ("libPrecursorHDF5.so")
+```
+
+## Current limitations
 Currently the boundary condition only works with vector fields!

@@ -331,7 +331,9 @@ void precursorHDF5FvPatchField<Type>::checkTable()
             samplePoints[pointI][0] = points[pointI][0];
             samplePoints[pointI][1] = points[pointI][1];
             samplePoints[pointI][2] = points[pointI][2];
+            //Info<<pointI<<":"<<samplePoints[pointI][0]<<","<<samplePoints[pointI][1]<<","<<samplePoints[pointI][2]<<endl;
         }
+
 
         Info << "precursorHDF5FvPatchField :"
              << " Read " << samplePoints.size() << " points" << endl;
@@ -453,25 +455,25 @@ void precursorHDF5FvPatchField<Type>::checkTable()
                                     H5P_DEFAULT);
 
     // Selection parameters
-    hsize_t offset[3];
+    hsize_t offset[3]; //Only the first one is used
     offset[0] = 0;
     offset[1] = 0;
     offset[2] = 0;
 
-    hsize_t count[3];
-    count[0] = nVelocity[1];
-    count[1] = nVelocity[2];
-    count[2] = 1;
+    hsize_t count[3]; // Time, Points, Dims
+    count[0] = 1;
+    count[1] = nVelocity[1];
+    count[2] = nVelocity[2];
 
     hsize_t nVelocitySlice[2];
     nVelocitySlice[0] = nVelocity[1];
     nVelocitySlice[1] = nVelocity[2];
 
+    // Create a new simple dataspace by the given rank and dims
     hid_t velocityMemspace = H5Screate_simple(2, nVelocitySlice, NULL);  
 
+    // Return a copy of the dataspace of the given dataset
     hid_t velocityDataspace = H5Dget_space(velocityDataset);
-
-
 
     if (lo != startSampleTime_)
     {
@@ -505,7 +507,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
 
             hdf5Status = H5Sselect_hyperslab(velocityDataspace, H5S_SELECT_SET, offset, NULL,
                                              count, NULL);
-            
+
             if (hdf5Status < 0)
             {
                 Info << "HDF5 error selecting velocity slice." << endl;
@@ -513,8 +515,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
             
             // Read in the slice
             hdf5Status = H5Dread(velocityDataset, H5T_NATIVE_DOUBLE, velocityMemspace, velocityDataspace,
-                    H5P_DEFAULT, velocity);
-
+                                 H5P_DEFAULT, velocity);
 
 
             if (hdf5Status < 0)
@@ -535,15 +536,16 @@ void precursorHDF5FvPatchField<Type>::checkTable()
             (
                 IOobject
                 (
-                    fieldTableName_,
+                   
+                    "dummy", //fieldTableName_,
                     this->db().time().constant(),
                     "boundaryData"
                    /this->patch().name()
                    /sampleTimes_[startSampleTime_].name(),
                     this->db(),
                     IOobject::NO_READ,
-                    IOobject::NO_WRITE,
-                    false
+                    IOobject::NO_WRITE
+                    //false
                 ),
                 nVelocity[1]
             );
@@ -559,23 +561,25 @@ void precursorHDF5FvPatchField<Type>::checkTable()
                     <<  mapperPtr_().sourceSize()
                     << ") in file " << vals.objectPath() << exit(FatalError);
             }
-
-            forAll(vals, i)
+            
+            if (this->db().template 
+                    foundObject<Field<vector> >("dummy") )
             {
-                if (this->db().template 
-                        foundObject<AverageIOField<vector> >(fieldTableName_))
+                Info << "Assigning read velocity values" << endl;
+                AverageIOField<vector> & field(const_cast<AverageIOField<vector> &>(this->db().template
+                            lookupObject<AverageIOField<vector> >("dummy")));
+                forAll(vals, i)
                 {
-                    Info << "Assigning read velocity values" << endl;
-                    AverageIOField<vector> & field(const_cast<AverageIOField<vector> &>(this->db().template 
-                            lookupObject<AverageIOField<vector> >(fieldTableName_)));
-                    field[i][0]= velocity[i][0];
-                    field[i][1]= velocity[i][1];
-                    field[i][2]= velocity[i][2];
+                    field[i][0] = velocity[i][0];
+                    field[i][1] = velocity[i][1];
+                    field[i][2] = velocity[i][2];
                 }
+                //Info<<"Check table:"<<vals[100]<<"-("<<velocity[100][0]<<" "<<velocity[100][1]<<" "<<velocity[100][2]<<")\n";
             }
 
             startAverage_ = vals.average();
             startSampledValues_ = mapperPtr_().interpolate(vals);
+            //Info<<"Check average:"<<startAverage_<<endl;
         }
     }
 
@@ -628,15 +632,15 @@ void precursorHDF5FvPatchField<Type>::checkTable()
             (
                 IOobject
                 (
-                    fieldTableName_,
+                    "dummy", //fieldTableName_,
                     this->db().time().constant(),
                     "boundaryData"
                    /this->patch().name()
                    /sampleTimes_[endSampleTime_].name(),
                     this->db(),
                     IOobject::NO_READ,
-                    IOobject::NO_WRITE,
-                    false
+                    IOobject::NO_WRITE
+                    //false
                 ),
                 nVelocity[1]
             );
@@ -653,21 +657,20 @@ void precursorHDF5FvPatchField<Type>::checkTable()
                     << ") in file " << vals.objectPath() << exit(FatalError);
             }
 
-            forAll(vals, i)
+            if (this->db().template 
+                    foundObject<AverageIOField<vector> >("dummy"))
             {
-                if (this->db().template 
-                        foundObject<AverageIOField<vector> >(fieldTableName_))
+                Info << "Assigning read velocity values" << endl;
+                AverageIOField<vector> & field(const_cast<AverageIOField<vector> &>(this->db().template 
+                            lookupObject<AverageIOField<vector> >("dummy")));
+                forAll(vals, i)
                 {
-                    Info << "Assigning read velocity values" << endl;
-                    AverageIOField<vector> & field(const_cast<AverageIOField<vector> &>(this->db().template 
-                            lookupObject<AverageIOField<vector> >(fieldTableName_)));
                     field[i][0]= velocity[i][0];
                     field[i][1]= velocity[i][1];
                     field[i][2]= velocity[i][2];
                 }
             }
 
-            //Info << vals << endl;
             endAverage_ = vals.average();
             endSampledValues_ = mapperPtr_().interpolate(vals);
         }
