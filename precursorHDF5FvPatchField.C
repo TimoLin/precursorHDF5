@@ -48,6 +48,7 @@ precursorHDF5FvPatchField
     fieldTableName_(iF.name()),
     setAverage_(false),
     perturb_(0),
+    recycling_(false),
     mapperPtr_(NULL),
     sampleTimes_(0),
     startSampleTime_(-1),
@@ -76,6 +77,7 @@ precursorHDF5FvPatchField
     setAverage_(ptf.setAverage_),
     perturb_(ptf.perturb_),
     mapMethod_(ptf.mapMethod_),
+    recycling_(ptf.recycling_),
     mapperPtr_(NULL),
     sampleTimes_(0),
     startSampleTime_(-1),
@@ -115,6 +117,7 @@ precursorHDF5FvPatchField
             "planarInterpolation"
         )
     ),
+    recycling_(readBool(dict.lookup("recycling"))),
     mapperPtr_(NULL),
     sampleTimes_(0),
     startSampleTime_(-1),
@@ -179,6 +182,7 @@ precursorHDF5FvPatchField
     setAverage_(ptf.setAverage_),
     perturb_(ptf.perturb_),
     mapMethod_(ptf.mapMethod_),
+    recycling_(ptf.recycling_),
     mapperPtr_(NULL),
     sampleTimes_(ptf.sampleTimes_),
     startSampleTime_(ptf.startSampleTime_),
@@ -403,15 +407,43 @@ void precursorHDF5FvPatchField<Type>::checkTable()
     // Find current time in sampleTimes
     label lo = -1;
     label hi = -1;
+    
+    double period = sampleTimes_[sampleTimes_.size()-1].value()-sampleTimes_[0].value();
+    
+    double dbTime = this->db().time().value();
+    
+    // Take remainder
+    double seekTime;
+    if (recycling_)
+    {
+        seekTime= dbTime - int(dbTime/period)*period;
+    }
+    else
+    {
+        seekTime = dbTime;
+    }
+
+    if (seekTime < SMALL)
+    {
+        startSampleTime_ = -1;
+    }
 
     bool foundTime = mapperPtr_().findTime
     (
         sampleTimes_,
         startSampleTime_,
-        this->db().time().value(),
+        seekTime,//this->db().time().value(),
         lo,
         hi
     );
+    
+
+    if (false)
+    {
+        Info<<"\n Debug Recycling:"<<this->db().time().value()
+            << " Data: "<<period<<","<<dbTime<<","<<seekTime<<","
+            <<foundTime<<","<<lo<<","<<hi<<"," <<startSampleTime_<<"\n"; 
+    }
 
     if (!foundTime)
     {
@@ -816,6 +848,8 @@ void precursorHDF5FvPatchField<Type>::write(Ostream& os) const
         os.writeKeyword("mapMethod") << mapMethod_
             << token::END_STATEMENT << nl;
     }
+
+    os.writeKeyword("recycling") << recycling_ << token::END_STATEMENT << nl;
 
     offset_->writeData(os);
 

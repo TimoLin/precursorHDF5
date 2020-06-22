@@ -51,11 +51,12 @@ Description
         perturb      | perturb points for regular geometries | no | 1e-5
         fieldTableName | alternative field name to sample | no| this field name
         mapMethod    | type of mapping | no | planarInterpolation
-        hdf5FileName | name the hdf5 file  | yes
-        hdf5PointsDatasetName      | name of the dataset containg the points | yes
-        hdf5SampleTimesDatasetName | name of the dataset containing the sample times | yes
+        recycling    | flag to activate recycling of inlet data library| yes/false|
+        hdf5FileName | name the hdf5 file  | --
+        hdf5PointsDatasetName      | name of the dataset containg the points | --
+        hdf5SampleTimesDatasetName | name of the dataset containing the sample times | --
         hdf5FieldValuesDatasetName | name of the dataset containing the
-                                     values of the field | yes
+                                     values of the field | --
     \endtable
 
     /verbatim
@@ -65,9 +66,11 @@ Description
         setAverage      false;
         //perturb       0.0;
         //fieldTableName samples;
+        mapMethod       nearest;
+        recycling       false;
         hdf5FileName    "db.hdf5";
         hdf5PointsDatasetName    "points";
-        hdf5SampleTimesDatasetName    "time";
+        hdf5SampleTimesDatasetName    "times";
         hdf5FieldValuesDatasetName    "velocity";
         
     }
@@ -117,6 +120,9 @@ class precursorHDF5FvPatchField
 
         //- Interpolation scheme to use
         word mapMethod_;
+
+        //- If true recycling using the inlet data library
+        bool recycling_;
 
         //- 2D interpolation (for 'planarInterpolation' mapMethod)
         autoPtr<pointToPointPlanarInterpolation> mapperPtr_;

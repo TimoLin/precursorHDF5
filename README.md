@@ -2,8 +2,9 @@
 
 This boundary condition is adapted from [timevaryingmappedhdf5fixedvalue](https://gitlab.com/chalmers-marine-technology/timevaryingmappedhdf5fixedvalue).
 
-This modification makes the boundary condition read all the data from a single file, in HDF5 format.
-More about this file format can be found [at the official web-site](https://www.hdfgroup.org/HDF5/).
+This modification makes the boundary condition read all the data from a single file, in HDF5 format.More about this file format can be found [at the official web-site](https://www.hdfgroup.org/HDF5/).
+
+A recycling usage of the precursor's library is introduced. This can be triggered using `recycling   true;` in the bc file.
 
 ## Prerequisite
 ### HDF5 library
@@ -70,6 +71,8 @@ inlet
     setAverage      false;
     offset          (0 0 0);
     perturb         0.0;
+    mapMethod       nearest; //planarInterpolation;
+    recycling       true;
     hdf5FileName    "dbTest.hdf5";
     hdf5PointsDatasetName    "points";
     hdf5SampleTimesDatasetName    "times";
