@@ -58,7 +58,10 @@ precursorHDF5FvPatchField
     endSampledValues_(0),
     endAverage_(pTraits<Type>::zero),
     offset_(),
-    hdf5PointsDatasetName_("points")
+    hdf5FileName_("dummy.hdf5"),
+    hdf5PointsDatasetName_("points"),
+    hdf5SampleTimesDatasetName_("times"),
+    hdf5FieldValuesDatasetName_("velocity")
 {}
 
 
@@ -92,7 +95,10 @@ precursorHDF5FvPatchField
       ? ptf.offset_().clone().ptr()
       : NULL
     ),
-    hdf5PointsDatasetName_("points")
+    hdf5FileName_(ptf.hdf5FileName_),
+    hdf5PointsDatasetName_(ptf.hdf5PointsDatasetName_),
+    hdf5SampleTimesDatasetName_(ptf.hdf5SampleTimesDatasetName_),
+    hdf5FieldValuesDatasetName_(ptf.hdf5FieldValuesDatasetName_)
 {}
 
 
@@ -128,6 +134,7 @@ precursorHDF5FvPatchField
     endAverage_(pTraits<Type>::zero),
     offset_(DataEntry<Type>::New("offset", dict))
 {
+
     if
     (
         mapMethod_ != "planarInterpolation"
