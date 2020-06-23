@@ -1,4 +1,8 @@
-# precursorHDF5
+precursorHDF5
+=============
+[![OpenFOAM 2.3.1](https://img.shields.io/badge/OpenFOAM-2.3.1-blue)](https://openfoam.org/download/2-3-1-source/)
+[![OpenFOAM 2.3.x](https://img.shields.io/badge/OpenFOAM-2.3.x-blue)](https://github.com/OpenFOAM/OpenFOAM-2.3.x)
+
 
 This boundary condition is adapted from [timevaryingmappedhdf5fixedvalue](https://gitlab.com/chalmers-marine-technology/timevaryingmappedhdf5fixedvalue).
 
@@ -33,8 +37,8 @@ export HDF5_DIR=$HOME/software/hdf5/latest
 ### Install
 Clone this repo to your local drive and compile, say: 
 ```sh
-git clone git@github.com:TimoLin/precursorHDF5.git ~/OpenFOAM/$WM_PROJECT_USER_DIR/precursorHDF5
-cd ~/OpenFOAM/$WM_PROJECT_USER_DIR/precursorHDF5
+git clone git@github.com:TimoLin/precursorHDF5.git $WM_PROJECT_USER_DIR/precursorHDF5
+cd $WM_PROJECT_USER_DIR/precursorHDF5
 wmake
 ```
 
