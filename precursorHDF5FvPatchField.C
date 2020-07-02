@@ -349,7 +349,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         Info << "precursorHDF5FvPatchField :"
              << " Read " << samplePoints.size() << " points" << endl;
 
-        if (false)
+        if (debug)
         {
             Info << samplePoints << endl;
         }
@@ -421,6 +421,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
     
     // Take remainder
     double seekTime;
+    //Info<<"Test:"<<recycling_<<endl;
     if (recycling_)
     {
         seekTime= dbTime - int(dbTime/period)*period;
@@ -433,6 +434,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
     if (seekTime < SMALL)
     {
         startSampleTime_ = -1;
+        endSampleTime_ = -1;
     }
 
     bool foundTime = mapperPtr_().findTime
@@ -445,11 +447,12 @@ void precursorHDF5FvPatchField<Type>::checkTable()
     );
     
 
-    if (false)
+    if (debug)
     {
         Info<<"\n Debug Recycling:"<<this->db().time().value()
             << " Data: "<<period<<","<<dbTime<<","<<seekTime<<","
-            <<foundTime<<","<<lo<<","<<hi<<"," <<startSampleTime_<<"\n"; 
+            <<foundTime<<","<<lo<<","<<hi<<"," <<startSampleTime_<<","
+            <<endSampleTime_<<"\n"; 
     }
 
     if (!foundTime)
@@ -613,12 +616,11 @@ void precursorHDF5FvPatchField<Type>::checkTable()
                     field[i][1] = velocity[i][1];
                     field[i][2] = velocity[i][2];
                 }
-                //Info<<"Check table:"<<vals[100]<<"-("<<velocity[100][0]<<" "<<velocity[100][1]<<" "<<velocity[100][2]<<")\n";
+                //Info<<"Check table @ lo:"<<vals[100]<<"-("<<velocity[100][0]<<" "<<velocity[100][1]<<" "<<velocity[100][2]<<")\n";
             }
 
             startAverage_ = vals.average();
             startSampledValues_ = mapperPtr_().interpolate(vals);
-            //Info<<"Check average:"<<startAverage_<<endl;
         }
     }
 
@@ -629,7 +631,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         if (endSampleTime_ == -1)
         {
             // endTime no longer valid. Might as well clear endValues.
-            if (true)
+            if (debug)
             {
                 Pout<< "checkTable : Clearing endValues" << endl;
             }
@@ -637,7 +639,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         }
         else
         {
-            if (false)
+            if (debug)
             {
                 Pout<< "checkTable : Reading endValues from "
                     <<   "boundaryData"
@@ -708,6 +710,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
                     field[i][1]= velocity[i][1];
                     field[i][2]= velocity[i][2];
                 }
+                //Info<<"Check table @ hi:"<<vals[100]<<"-("<<velocity[100][0]<<" "<<velocity[100][1]<<" "<<velocity[100][2]<<")\n";
             }
 
             endAverage_ = vals.average();
@@ -753,10 +756,24 @@ void precursorHDF5FvPatchField<Type>::updateCoeffs()
     }
     else
     {
+        double period = sampleTimes_[sampleTimes_.size()-1].value()-sampleTimes_[0].value();
+        double dbTime = this->db().time().value();
+
+        // Take remainder
+        double seekTime;        
+        if (recycling_)
+        {
+            seekTime= dbTime - int(dbTime/period)*period;
+        }
+        else
+        {
+            seekTime = dbTime;
+        }
+
         scalar start = sampleTimes_[startSampleTime_].value();
         scalar end = sampleTimes_[endSampleTime_].value();
 
-        scalar s = (this->db().time().value() - start)/(end - start);
+        scalar s = (seekTime - start)/(end - start);
 
         if (debug)
         {
