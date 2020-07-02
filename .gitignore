@@ -5,3 +5,4 @@ Make/*
 !/Make/files
 !/Make/options
 *.swp
+*.tar.gz
