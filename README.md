@@ -87,7 +87,7 @@ inlet
 
 Add the following line to `controlDict` when using it:
 ```cpp
-libs ("libPrecursorHDF5.so")
+libs ("libPrecursorHDF5.so");
 ```
 
 ## Current limitations
