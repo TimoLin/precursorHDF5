@@ -415,12 +415,12 @@ void precursorHDF5FvPatchField<Type>::checkTable()
     label lo = -1;
     label hi = -1;
     
-    double period = sampleTimes_[sampleTimes_.size()-1].value()-sampleTimes_[0].value();
+    scalar period = sampleTimes_[sampleTimes_.size()-1].value()-sampleTimes_[0].value();
     
-    double dbTime = this->db().time().value();
+    scalar dbTime = this->db().time().value();
     
     // Take remainder
-    double seekTime;
+    scalar seekTime;
     //Info<<"Test:"<<recycling_<<endl;
     if (recycling_)
     {
@@ -431,8 +431,11 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         seekTime = dbTime;
     }
 
-    if (seekTime < SMALL)
-    {
+    if (seekTime < this->db().time().deltaTValue())
+    {   
+        // Avoid numerical error
+        seekTime = 0.0;
+
         startSampleTime_ = -1;
         endSampleTime_ = -1;
     }
@@ -447,12 +450,16 @@ void precursorHDF5FvPatchField<Type>::checkTable()
     );
     
 
-    if (debug)
+    if (true)
     {
-        Info<<"\n Debug Recycling:"<<this->db().time().value()
-            << " Data: "<<period<<","<<dbTime<<","<<seekTime<<","
-            <<foundTime<<","<<lo<<","<<hi<<"," <<startSampleTime_<<","
-            <<endSampleTime_<<"\n"; 
+        Info<<" Debug Recycling:"
+            <<" Current time:"<<dbTime
+            <<" Current deltaT:"<<this->db().time().deltaTValue()
+            <<",seekTimeeekTime:"<<seekTime
+            <<",found:"<<foundTime
+            <<",lo:"<<lo<<",hi:"<<hi
+            <<",startSampleTime:" <<startSampleTime_
+            <<",endSampleTime:"<<endSampleTime_<<"\n"; 
     }
 
     if (!foundTime)
@@ -524,7 +531,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         if (startSampleTime_ == endSampleTime_)
         {
             // No need to reread since are end values
-            if (debug)
+            if (true)
             {
                 Pout<< "checkTable : Setting startValues to (already read) "
                     << sampleTimes_[startSampleTime_].name()
@@ -535,7 +542,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         }
         else
         {
-            if (debug)
+            if (true)
             {
                 Pout<< "checkTable : Reading startValues from "
                     <<   "boundaryData"
@@ -631,7 +638,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         if (endSampleTime_ == -1)
         {
             // endTime no longer valid. Might as well clear endValues.
-            if (debug)
+            if (true)
             {
                 Pout<< "checkTable : Clearing endValues" << endl;
             }
@@ -639,7 +646,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         }
         else
         {
-            if (debug)
+            if (true)
             {
                 Pout<< "checkTable : Reading endValues from "
                     <<   "boundaryData"
@@ -744,7 +751,7 @@ void precursorHDF5FvPatchField<Type>::updateCoeffs()
     if (endSampleTime_ == -1)
     {
         // only start value
-        if (debug)
+        if (true)
         {
             Pout<< "updateCoeffs : Sampled, non-interpolated values"
                 << " from start time:"
@@ -756,18 +763,23 @@ void precursorHDF5FvPatchField<Type>::updateCoeffs()
     }
     else
     {
-        double period = sampleTimes_[sampleTimes_.size()-1].value()-sampleTimes_[0].value();
-        double dbTime = this->db().time().value();
+        scalar period = sampleTimes_[sampleTimes_.size()-1].value()-sampleTimes_[0].value();
+        scalar dbTime = this->db().time().value();
 
         // Take remainder
-        double seekTime;        
+        scalar seekTime;        
         if (recycling_)
         {
-            seekTime= dbTime - int(dbTime/period)*period;
+            seekTime = dbTime - int(dbTime/period)*period;
         }
         else
         {
             seekTime = dbTime;
+        }
+
+        if (seekTime < this->db().time().deltaTValue())
+        {
+            seekTime = 0.0;
         }
 
         scalar start = sampleTimes_[startSampleTime_].value();
@@ -775,12 +787,13 @@ void precursorHDF5FvPatchField<Type>::updateCoeffs()
 
         scalar s = (seekTime - start)/(end - start);
 
-        if (debug)
+        if (true)
         {
             Pout<< "updateCoeffs : Sampled, interpolated values"
                 << " between start time:"
                 << sampleTimes_[startSampleTime_].name()
                 << " and end time:" << sampleTimes_[endSampleTime_].name()
+                << " for seek time:"<< seekTime
                 << " with weight:" << s << endl;
         }
 
