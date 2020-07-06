@@ -450,7 +450,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
     );
     
 
-    if (true)
+    if (debug)
     {
         Info<<" Debug Recycling:"
             <<" Current time:"<<dbTime
@@ -531,7 +531,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         if (startSampleTime_ == endSampleTime_)
         {
             // No need to reread since are end values
-            if (true)
+            if (debug)
             {
                 Pout<< "checkTable : Setting startValues to (already read) "
                     << sampleTimes_[startSampleTime_].name()
@@ -542,7 +542,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         }
         else
         {
-            if (true)
+            if (debug)
             {
                 Pout<< "checkTable : Reading startValues from "
                     <<   "boundaryData"
@@ -638,7 +638,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         if (endSampleTime_ == -1)
         {
             // endTime no longer valid. Might as well clear endValues.
-            if (true)
+            if (debug)
             {
                 Pout<< "checkTable : Clearing endValues" << endl;
             }
@@ -646,7 +646,7 @@ void precursorHDF5FvPatchField<Type>::checkTable()
         }
         else
         {
-            if (true)
+            if (debug)
             {
                 Pout<< "checkTable : Reading endValues from "
                     <<   "boundaryData"
@@ -751,7 +751,7 @@ void precursorHDF5FvPatchField<Type>::updateCoeffs()
     if (endSampleTime_ == -1)
     {
         // only start value
-        if (true)
+        if (debug)
         {
             Pout<< "updateCoeffs : Sampled, non-interpolated values"
                 << " from start time:"
@@ -787,7 +787,7 @@ void precursorHDF5FvPatchField<Type>::updateCoeffs()
 
         scalar s = (seekTime - start)/(end - start);
 
-        if (true)
+        if (debug)
         {
             Pout<< "updateCoeffs : Sampled, interpolated values"
                 << " between start time:"
