@@ -162,6 +162,17 @@ precursorHDF5FvPatchField
     dict.readIfPresent("hdf5SampleTimesDatasetName", hdf5SampleTimesDatasetName_);
     dict.readIfPresent("hdf5FieldValuesDatasetName", hdf5FieldValuesDatasetName_);
 
+    // Check hdf5 file existence
+    if (!exists(hdf5FileName_))
+    {
+        FatalErrorIn
+        (
+            "precursorHDF5FvPatchField<Type>\n"
+        ) << "Can't find HDF5 library file: '"<< hdf5FileName_
+          << "' under the case root folder"<<endl
+          << exit(FatalError);
+    }
+
     if (dict.found("value"))
     {
         fvPatchField<Type>::operator==(Field<Type>("value", dict, p.size()));
