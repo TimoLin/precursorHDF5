@@ -6,3 +6,4 @@ Make/*
 !/Make/options
 *.swp
 *.tar.gz
+*.cache/
