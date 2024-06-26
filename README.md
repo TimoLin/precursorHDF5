@@ -13,6 +13,8 @@ This boundary condition is adapted from [timevaryingmappedhdf5fixedvalue](https:
 - Other features are similar to the **timeVaryingMappedFixedValue**.
 
 ## Schematic
+![figure3](https://github.com/TimoLin/precursorHDF5/assets/7792396/4a9dcc5d-681f-452a-9a6a-c317e89a6b48)
+
 
 ## Prerequisite
 ### HDF5 library
