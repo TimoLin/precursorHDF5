@@ -3,17 +3,21 @@ precursorHDF5
 [![OpenFOAM 2.3.1](https://img.shields.io/badge/OpenFOAM-2.3.1-blue)](https://openfoam.org/download/2-3-1-source/)
 [![OpenFOAM 2.3.x](https://img.shields.io/badge/OpenFOAM-2.3.x-blue)](https://github.com/OpenFOAM/OpenFOAM-2.3.x)
 
-
 This boundary condition is adapted from [timevaryingmappedhdf5fixedvalue](https://gitlab.com/chalmers-marine-technology/timevaryingmappedhdf5fixedvalue).
 
-This modification makes the boundary condition read all the data from a single file, in HDF5 format.More about this file format can be found [at the official web-site](https://www.hdfgroup.org/HDF5/).
+## Features
+- Turbulent inlet velocity library is stored in **one** [**HDF5**](https://www.hdfgroup.org/HDF5/) file.
+- No need to do the precursor simulation on the fly.
+- Rescaling the turbulent inlet velocity based on experimental data or user-defined profiles.
+- Support the **recycling usage** of the precursor's library.
+- Other features are similar to the **timeVaryingMappedFixedValue**.
 
-A recycling usage of the precursor's library is introduced. This can be triggered using `recycling   true;` in the bc file.
+## Schematic
 
 ## Prerequisite
 ### HDF5 library
 
-Intallation note:  
+Here is a brief tutorial of how to intall HDF5 lib:  
 ```sh
 # Install path
 cd $HOME/software
@@ -35,21 +39,21 @@ Set `hdf5` path in `.zshrc` or `.bashrc`:
 export HDF5_DIR=$HOME/software/hdf5/latest
 export LD_LIBRARY_PATH=$HDF5_DIR/lib:$LD_LIBRARY_PATH
 ```
-### Install
-Clone this repo to your local drive and compile, say: 
+### Install the precursorHDF5 bc
+Clone this repo to your local drive and compile, for example:
 ```sh
 git clone git@github.com:TimoLin/precursorHDF5.git $WM_PROJECT_USER_DIR/precursorHDF5
 cd $WM_PROJECT_USER_DIR/precursorHDF5
 wmake
 ```
 
-## Usage
+## Workflow
 ### Generate the hdf5 file
 Follow this Python script [tVMHDF5FV](https://github.com/TimoLin/pyScriptFoam/tree/master/inletTurb/tVMHDF5FV).  
 ### Use this bc
 The boundary condition expects that the hdf5 file will contain three datasets.
 
-One for the points, of shape N by 3, where N is the number of points you have available.
+One for the points, of shape N by 3, where N is the number of points you have in the sampling slice.
 The first column contains the x coordinates, the second the y coordinates, and the third the z coordinates.
 
 One for the time-values that the data is provided for, of shape nTimeValues by 1, where nTimeValues is simply the number of time-values that you are providing the data for.
@@ -76,13 +80,21 @@ inlet
     setAverage      false;
     offset          (0 0 0);
     perturb         0.0;
-    mapMethod       nearest; //planarInterpolation;
+    mapMethod       nearest; //or planarInterpolation;
     recycling       true;
     hdf5FileName    "dbTest.hdf5";
     hdf5PointsDatasetName    "points";
     hdf5SampleTimesDatasetName    "times";
     hdf5FieldValuesDatasetName    "velocity";
 }
+```
+
+Note: For the *hdf5FileName*, the file is under the case's root folder, i.e.:
+```sh
+├── 0
+├── constant   
+├── system
+└── dbTest.hdf5
 ```
 
 Add the following line to `controlDict` when using it:
