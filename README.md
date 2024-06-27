@@ -3,6 +3,9 @@ precursorHDF5
 [![OpenFOAM 2.3.1](https://img.shields.io/badge/OpenFOAM-2.3.1-blue)](https://openfoam.org/download/2-3-1-source/)
 [![OpenFOAM 2.3.x](https://img.shields.io/badge/OpenFOAM-2.3.x-blue)](https://github.com/OpenFOAM/OpenFOAM-2.3.x)
 
+**Please note**  
+For now, the code is only valid in `v2.3.1`. If you want to adapt it in newer versions, please start from the native [timeVayingMappedFixedValue](https://github.com/OpenFOAM/OpenFOAM-dev/blob/master/src/finiteVolume/fields/fvPatchFields/derived/timeVaryingMappedFixedValue/timeVaryingMappedFixedValueFvPatchField.H) bc, and add the new features of precursorHDF5 to it.
+
 This boundary condition is adapted from [timevaryingmappedhdf5fixedvalue](https://gitlab.com/chalmers-marine-technology/timevaryingmappedhdf5fixedvalue).
 
 ## Features
