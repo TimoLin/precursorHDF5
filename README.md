@@ -6,6 +6,10 @@ precursorHDF5
 **Please note**  
 For now, the code is only valid in `v2.3.1`. If you want to adapt it in newer versions, please start from the native [timeVayingMappedFixedValue](https://github.com/OpenFOAM/OpenFOAM-dev/blob/master/src/finiteVolume/fields/fvPatchFields/derived/timeVaryingMappedFixedValue/timeVaryingMappedFixedValueFvPatchField.H) bc, and add the new features of precursorHDF5 to it.
 
+If you are using this bc in your work, please consider citing [this paper](https://doi.org/10.1080/10618562.2024.2370802) :
+
+Zhang, Teng, Jinghua Li, Yingwen Yan, and Yuxin Fan. “Influence of LES Inflow Conditions on Simulations of a Piloted Diffusion Flame.” International Journal of Computational Fluid Dynamics, July 4, 2024, 1–15. https://doi.org/10.1080/10618562.2024.2370802.
+
 This boundary condition is adapted from [timevaryingmappedhdf5fixedvalue](https://gitlab.com/chalmers-marine-technology/timevaryingmappedhdf5fixedvalue).
 
 ## Features
