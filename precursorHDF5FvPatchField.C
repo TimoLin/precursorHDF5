@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Copyright (C) 2011-2019 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,7 +25,7 @@ License
 
 #include "precursorHDF5FvPatchField.H"
 #include "Time.H"
-#include "AverageIOField.H"
+#include "AverageField.H"
 
 #include "hdf5.h"
 #include "hdf5_hl.h"
@@ -132,7 +132,7 @@ precursorHDF5FvPatchField
     endSampleTime_(-1),
     endSampledValues_(0),
     endAverage_(pTraits<Type>::zero),
-    offset_(DataEntry<Type>::New("offset", dict))
+    offset_(Function1<Type>::New("offset", dict))
 {
 
     if
@@ -141,17 +141,8 @@ precursorHDF5FvPatchField
      && mapMethod_ != "nearest"
     )
     {
-        FatalIOErrorIn
-        (
-            "precursorHDF5FvPatchField<Type>::\n"
-            "precursorHDF5FvPatchField\n"
-            "(\n"
-            "    const fvPatch&\n"
-            "    const DimensionedField<Type, volMesh>&\n"
-            "    const dictionary&\n"
-            ")\n",
-            dict
-        )   << "mapMethod should be one of 'planarInterpolation'"
+        FatalIOErrorInFunction(dict)
+            << "mapMethod should be one of 'planarInterpolation'"
             << ", 'nearest'" << exit(FatalIOError);
     }
 
@@ -165,12 +156,10 @@ precursorHDF5FvPatchField
     // Check hdf5 file existence
     if (!exists(hdf5FileName_))
     {
-        FatalErrorIn
-        (
-            "precursorHDF5FvPatchField<Type>\n"
-        ) << "Can't find HDF5 library file: '"<< hdf5FileName_
-          << "' under the case root folder"<<endl
-          << exit(FatalError);
+        FatalErrorInFunction
+            << "Can't find HDF5 library file: '"<< hdf5FileName_
+            << "' under the case root folder"<<endl
+            << exit(FatalError);
     }
 
     if (dict.found("value"))
@@ -183,7 +172,7 @@ precursorHDF5FvPatchField
         //       by re-setting of fvatchfield::updated_ flag. This is
         //       so if first use is in the next time step it retriggers
         //       a new update.
-        this->evaluate(Pstream::blocking);
+        this->evaluate(Pstream::commsTypes::blocking);
     }
 }
 
@@ -268,8 +257,8 @@ void precursorHDF5FvPatchField<Type>::autoMap
     fixedValueFvPatchField<Type>::autoMap(m);
     if (startSampledValues_.size())
     {
-        startSampledValues_.autoMap(m);
-        endSampledValues_.autoMap(m);
+        m(startSampledValues_, startSampledValues_);
+        m(endSampledValues_, endSampledValues_);
     }
     // Clear interpolator
     mapperPtr_.clear();
@@ -288,10 +277,13 @@ void precursorHDF5FvPatchField<Type>::rmap
     fixedValueFvPatchField<Type>::rmap(ptf, addr);
 
     const precursorHDF5FvPatchField<Type>& tiptf =
-        refCast<const precursorHDF5FvPatchField<Type> >(ptf);
+        refCast<const precursorHDF5FvPatchField<Type>>(ptf);
 
-    startSampledValues_.rmap(tiptf.startSampledValues_, addr);
-    endSampledValues_.rmap(tiptf.endSampledValues_, addr);
+    if (startSampledValues_.size())
+    {
+        startSampledValues_.rmap(tiptf.startSampledValues_, addr);
+        endSampledValues_.rmap(tiptf.endSampledValues_, addr);
+    }
 
     // Clear interpolator
     mapperPtr_.clear();
@@ -476,10 +468,8 @@ void precursorHDF5FvPatchField<Type>::checkTable()
 
     if (!foundTime)
     {
-        FatalErrorIn
-        (
-            "precursorHDF5FvPatchField<Type>::checkTable()"
-        )   << "Cannot find starting sampling values for current time "
+        FatalErrorInFunction
+            << "Cannot find starting sampling values for current time "
             << this->db().time().value() << nl
             << "Have sampling values for times "
             << pointToPointPlanarInterpolation::timeNames(sampleTimes_) << nl
@@ -593,52 +583,36 @@ void precursorHDF5FvPatchField<Type>::checkTable()
             }
 
             // Reread values and interpolate
-            AverageIOField<Type> vals
-            (
-                IOobject
-                (
-                   
-                    "dummy", //fieldTableName_,
-                    this->db().time().constant(),
-                    "boundaryData"
-                   /this->patch().name()
-                   /sampleTimes_[startSampleTime_].name(),
-                    this->db(),
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                    //false
-                ),
-                nVelocity[1]
-            );
+            Field<Type> vals(nVelocity[1]);
 
             if (vals.size() != mapperPtr_().sourceSize())
             {
-                FatalErrorIn
-                (
-                    "precursorHDF5FvPatchField<Type>::"
-                    "checkTable()"
-                )   << "Number of values (" << vals.size()
+                FatalErrorInFunction
+                    << "Number of values (" << vals.size()
                     << ") differs from the number of points ("
                     <<  mapperPtr_().sourceSize()
-                    << ") in file " << vals.objectPath() << exit(FatalError);
+                    << ") in HDF5 dataset" << exit(FatalError);
             }
             
-            if (this->db().template 
-                    foundObject<AverageIOField<vector > >("dummy") )
+            // Fill vals from HDF5 velocity data
+            forAll(vals, i)
             {
-                Info << "Assigning read velocity values" << endl;
-                AverageIOField<vector> & field(const_cast<AverageIOField<vector> &>(this->db().template
-                            lookupObject<AverageIOField<vector> >("dummy")));
-                forAll(vals, i)
+                if constexpr (pTraits<Type>::nComponents == 3)
                 {
-                    field[i][0] = velocity[i][0];
-                    field[i][1] = velocity[i][1];
-                    field[i][2] = velocity[i][2];
+                    vals[i][0] = velocity[i][0];
+                    vals[i][1] = velocity[i][1]; 
+                    vals[i][2] = velocity[i][2];
                 }
-                //Info<<"Check table @ lo:"<<vals[100]<<"-("<<velocity[100][0]<<" "<<velocity[100][1]<<" "<<velocity[100][2]<<")\n";
+                else
+                {
+                    // For non-vector types, throw exception
+                    FatalErrorInFunction
+                        << "Only vector field is supported."
+                        << exit(FatalError);
+                }
             }
 
-            startAverage_ = vals.average();
+            startAverage_ = gAverage(vals);
             startSampledValues_ = mapperPtr_().interpolate(vals);
         }
     }
@@ -688,51 +662,36 @@ void precursorHDF5FvPatchField<Type>::checkTable()
             }
 
             // Reread values and interpolate
-            AverageIOField<Type> vals
-            (
-                IOobject
-                (
-                    "dummy", //fieldTableName_,
-                    this->db().time().constant(),
-                    "boundaryData"
-                   /this->patch().name()
-                   /sampleTimes_[endSampleTime_].name(),
-                    this->db(),
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                    //false
-                ),
-                nVelocity[1]
-            );
+            Field<Type> vals(nVelocity[1]);
 
             if (vals.size() != mapperPtr_().sourceSize())
             {
-                FatalErrorIn
-                (
-                    "precursorHDF5FvPatchField<Type>::"
-                    "checkTable()"
-                )   << "Number of values (" << vals.size()
+                FatalErrorInFunction
+                    << "Number of values (" << vals.size()
                     << ") differs from the number of points ("
                     <<  mapperPtr_().sourceSize()
-                    << ") in file " << vals.objectPath() << exit(FatalError);
+                    << ") in HDF5 dataset" << exit(FatalError);
             }
 
-            if (this->db().template 
-                    foundObject<AverageIOField<vector> >("dummy"))
+            // Fill vals from HDF5 velocity data
+            forAll(vals, i)
             {
-                Info << "Assigning read velocity values" << endl;
-                AverageIOField<vector> & field(const_cast<AverageIOField<vector> &>(this->db().template 
-                            lookupObject<AverageIOField<vector> >("dummy")));
-                forAll(vals, i)
+                if constexpr (pTraits<Type>::nComponents == 3)
                 {
-                    field[i][0]= velocity[i][0];
-                    field[i][1]= velocity[i][1];
-                    field[i][2]= velocity[i][2];
+                    vals[i][0] = velocity[i][0];
+                    vals[i][1] = velocity[i][1]; 
+                    vals[i][2] = velocity[i][2];
                 }
-                //Info<<"Check table @ hi:"<<vals[100]<<"-("<<velocity[100][0]<<" "<<velocity[100][1]<<" "<<velocity[100][2]<<")\n";
+                else
+                {
+                    // For non-vector types, throw exception
+                    FatalErrorInFunction
+                        << "Only vector field is supported."
+                        << exit(FatalError);
+                }
             }
 
-            endAverage_ = vals.average();
+            endAverage_ = gAverage(vals);
             endSampledValues_ = mapperPtr_().interpolate(vals);
         }
     }
@@ -880,7 +839,7 @@ void precursorHDF5FvPatchField<Type>::write(Ostream& os) const
         os.writeKeyword("perturb") << perturb_ << token::END_STATEMENT << nl;
     }
 
-    if (fieldTableName_ != this->dimensionedInternalField().name())
+    if (fieldTableName_ != this->internalField().name())
     {
         os.writeKeyword("fieldTableName") << fieldTableName_
             << token::END_STATEMENT << nl;
@@ -913,7 +872,7 @@ void precursorHDF5FvPatchField<Type>::write(Ostream& os) const
     os.writeKeyword("hdf5FieldValuesDatasetName") << hdf5FieldValuesDatasetName_
         << token::END_STATEMENT <<nl;
 
-    this->writeEntry("value", os);
+    writeEntry(os, "value", *this);
 }
 
 
