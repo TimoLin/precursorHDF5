@@ -19,6 +19,16 @@ This boundary condition is adapted from [timevaryingmappedhdf5fixedvalue](https:
 - Support the **recycling usage** of the precursor's library.
 - Other features are similar to the **timeVaryingMappedFixedValue**.
 
+## Compatibility
+- For **OpenFOAM v2.3.1** and **OpenFOAM-2.3.x**, use the `master` branch.
+  ```
+  git checkout master
+  ```
+- For **OpenFOAM v7**, use the `of7` branch.
+  ```
+  git checkout of7
+  ```
+
 ## Schematic
 ![figure3](https://github.com/TimoLin/precursorHDF5/assets/7792396/4a9dcc5d-681f-452a-9a6a-c317e89a6b48)
 
