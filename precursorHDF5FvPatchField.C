@@ -351,7 +351,8 @@ void precursorHDF5FvPatchField<Type>::checkTable()
 
 
         Info << "precursorHDF5FvPatchField :"
-             << " Read " << samplePoints.size() << " points" << endl;
+             << " Read " << samplePoints.size() << " points" << endl
+             << endl;
 
         if (debug)
         {
@@ -674,21 +675,22 @@ void precursorHDF5FvPatchField<Type>::checkTable()
             }
 
             // Fill vals from HDF5 velocity data
-            forAll(vals, i)
+            if constexpr (pTraits<Type>::nComponents == 3)
             {
-                if constexpr (pTraits<Type>::nComponents == 3)
+                Info << "PrecursorHDF5: Assigning velocity data to inlet patch" << endl;
+                forAll(vals, i)
                 {
                     vals[i][0] = velocity[i][0];
                     vals[i][1] = velocity[i][1]; 
                     vals[i][2] = velocity[i][2];
                 }
-                else
-                {
+            }
+            else
+            {
                     // For non-vector types, throw exception
                     FatalErrorInFunction
                         << "Only vector field is supported."
                         << exit(FatalError);
-                }
             }
 
             endAverage_ = gAverage(vals);
